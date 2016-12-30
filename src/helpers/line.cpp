@@ -21,4 +21,20 @@ QVector<float> Line::toVBO()
         result.append(dot.y());
     }
 
+    return result;
+}
+
+QLinkedList<QVector2D>::iterator Line::cutNthLine(int n)
+{
+        Q_ASSERT(n <= dots.size() - 2);
+        auto it = dots.begin();
+        while (n > 0)
+        {
+            ++it;
+            --n;
+        }
+        QVector2D newDot = (1./2.) * (*it + *(it+1));
+
+        return dots.insert(it+1, newDot);
+
 }

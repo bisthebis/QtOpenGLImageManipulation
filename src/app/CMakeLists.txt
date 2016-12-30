@@ -11,6 +11,7 @@ find_package (Qt5Widgets REQUIRED)
 target_link_libraries (application Qt5::Core)
 target_link_libraries (application Qt5::Gui)
 target_link_libraries (application Qt5::Widgets)
+target_link_libraries (application helpers)
 
 
 

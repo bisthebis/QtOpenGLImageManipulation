@@ -5,10 +5,12 @@
 #include <QOpenGLFunctions>
 #include <QtGui>
 #include <QtCore>
+#include "../helpers/line.h"
 
 QOpenGLBuffer vbo;
 QOpenGLBuffer vbo2;
-QOpenGLVertexArrayObject vao;
+QOpenGLBuffer vbo_line;
+QOpenGLVertexArrayObject vao, vao_line;
 static float vertices[] = {
     -1, -1, -1,
     1, -1, -1,
@@ -63,8 +65,11 @@ static float colors[] = {
 };
 static const char* vertex = "attribute vec3 input_vertex; attribute vec3 color; varying vec3 oColor; uniform mat4 projection; uniform mat4 view; void main(){oColor = color; gl_Position = projection * view * vec4(input_vertex, 1);}";
 static const char* frag = "varying vec3 oColor; void main() {gl_FragColor = vec4(oColor, 1);}";
+static const char* vertex_line = "attribute vec2 input_vertex; uniform mat4 projection; uniform mat4 view; void main(){gl_Position = projection * view * vec4(input_vertex, 0, 1);}";
+static const char* frag_line = "void main() {gl_FragColor = vec4(1, 1, 1, 1);}";
 QOpenGLShaderProgram shader;
 QTime timer;
+static int sizeOfLine;
 
 SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) : QOpenGLWidget(parent, f)
 {
@@ -91,7 +96,7 @@ void SampleWidget::initializeGL()
                 (context->format().version().first)
                 .arg(context->format().version().second);
 
-    vao.create();
+    /*vao.create();
     vao.bind();
 
     vbo.create();
@@ -108,13 +113,34 @@ void SampleWidget::initializeGL()
 
 
 
-    vao.release();
+    vao.release();*/
+
+    Line line;
+    line.pushDot({0,0});
+    line.pushDot({1,1});
+    line.pushDot({2,0});
+    line.pushDot({3,1});
+    line.pushDot({4,0});
+    *line.cutNthLine(0) += {0, -1};
+    auto data = line.toVBO();
+    sizeOfLine = data.length()/2;
+    qDebug() << data;
+    qDebug() << "Length : " << data.length();
+
+    vao_line.create();
+    vao_line.bind();
+
+    vbo_line.create();
+    vbo_line.bind();
+    vbo_line.allocate(data.constData(), data.size()*sizeof(float));
+    f->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), 0);
+    f->glEnableVertexAttribArray(0);
 
     //Init shader;
-    shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
-    shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
+    shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex_line);
+    shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag_line);
     shader.link();
-    shader.bind();
+    shader.bind();//*/
 }
 void SampleWidget::resizeGL(int w, int h)
 {
@@ -127,14 +153,23 @@ void SampleWidget::paintGL()
 {
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    vao.bind();
     float value = sin(double(timer.elapsed())/300);
     view.setToIdentity();
-    view.lookAt({10, value*10, value*10}, {0, 0, 0},  {0, 0, 1});
-    //shader.setUniformValue("value", value);
+    view.lookAt({0, 10+value*10, 10}, {0, 0, 0},  {0, 0, 1});
+
     shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
-    f->glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices)/12);
+
+    /*vao.bind();
+    //shader.setUniformValue("value", value);
+
+    f->glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices)/12);*/
+
+    vao.bind();
+    f->glDrawArrays(GL_LINE_STRIP, 0, sizeOfLine);
+
+
+
     update();
 
 
