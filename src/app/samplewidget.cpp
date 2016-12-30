@@ -79,7 +79,7 @@ SampleWidget::~SampleWidget()
 void SampleWidget::initializeGL()
 {
     setUpdatesEnabled(true);
-    static QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    f = QOpenGLContext::currentContext()->functions();
     f->glClearColor(0, 0.5, 1, 1);
     f->glDisable(GL_CULL_FACE);
     f->glEnable(GL_DEPTH_TEST);
@@ -125,9 +125,6 @@ void SampleWidget::resizeGL(int w, int h)
 
 void SampleWidget::paintGL()
 {
-    //qDebug() << "Drawing widget";
-    static QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     vao.bind();

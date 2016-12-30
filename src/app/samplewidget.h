@@ -4,6 +4,8 @@
 #include <QOpenGLWidget>
 #include <QMatrix4x4>
 
+class QOpenGLFunctions;
+
 class SampleWidget : public QOpenGLWidget
 {
 public:
@@ -18,6 +20,7 @@ protected:
 private:
     QMatrix4x4 projection;
     QMatrix4x4 view;
+    QOpenGLFunctions* f;
 };
 
 #endif // SAMPLEWIDGET_H
