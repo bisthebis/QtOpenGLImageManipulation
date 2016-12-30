@@ -7,8 +7,9 @@
 #include <QtCore>
 
 QOpenGLBuffer vbo;
+QOpenGLBuffer vbo2;
 QOpenGLVertexArrayObject vao;
-float vertices[] = {
+static float vertices[] = {
     -1, -1, -1,
     1, -1, -1,
     -1, 1, -1,
@@ -34,8 +35,34 @@ float vertices[] = {
     -1, -1, -1
 
 };
-static const char* vertex = "attribute vec3 input_vertex; uniform mat4 projection; uniform mat4 view; void main(){gl_Position = projection * view * vec4(input_vertex, 1);}";
-static const char* frag = "uniform float blue; void main() {gl_FragColor = vec4(1, 1, blue, 1);}";
+
+static float colors[] = {
+    1,1,1,
+    1,1,1,
+    1,1,1,
+
+    1,1,1,
+    1,1,1,
+    1,1,1,
+
+    0,0,1,
+    0,0,1,
+    0,0,1,
+
+    0,1,0,
+    0,1,0,
+    0,1,0,
+
+    0,1,1,
+    1,1,0,
+    1,0,1,
+
+    1,0,0,
+    1,0,0,
+    1,0,0,
+};
+static const char* vertex = "attribute vec3 input_vertex; attribute vec3 color; varying vec3 oColor; uniform mat4 projection; uniform mat4 view; void main(){oColor = color; gl_Position = projection * view * vec4(input_vertex, 1);}";
+static const char* frag = "varying vec3 oColor; void main() {gl_FragColor = vec4(oColor, 1);}";
 QOpenGLShaderProgram shader;
 QTime timer;
 
@@ -70,9 +97,16 @@ void SampleWidget::initializeGL()
     vbo.create();
     vbo.bind();
     vbo.allocate(vertices, sizeof(vertices));
-
     f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
     f->glEnableVertexAttribArray(0);
+
+    vbo2.create();
+    vbo2.bind();
+    vbo2.allocate(colors, sizeof(colors));
+    f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
+    f->glEnableVertexAttribArray(1);
+
+
 
     vao.release();
 
@@ -97,11 +131,12 @@ void SampleWidget::paintGL()
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     vao.bind();
-    float value = 0.5 * (1 + sin(double(timer.elapsed())/300));
-    shader.setUniformValue("blue", value);
+    float value = sin(double(timer.elapsed())/300);
+    view.setToIdentity();
+    view.lookAt({10, value*10, value*10}, {0, 0, 0},  {0, 0, 1});
+    //shader.setUniformValue("value", value);
     shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
-    qDebug() << "sizeof(vertices)/12 == " << sizeof(vertices)/12;
     f->glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices)/12);
     update();
 
