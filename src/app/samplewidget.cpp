@@ -8,13 +8,42 @@
 
 QOpenGLBuffer vbo;
 QOpenGLVertexArrayObject vao;
-static float vertices[] = {0, 0.5,  0.5, -0.5, -0.5, -0.5};
+float vertices[] = {
+    -1, -1, -1,
+    1, -1, -1,
+    -1, 1, -1,
+
+    1, 1, -1,
+    -1, 1, -1,
+    1, -1, -1,
+
+    0, 0, 1,
+    -1, -1, -1,
+    1, -1, -1,
+
+    0, 0, 1,
+    1, -1, -1,
+    1, 1, -1,
+
+    0, 0, 1,
+    1, 1, -1,
+    -1, 1, -1,
+
+    0, 0, 1,
+    -1, 1, -1,
+    -1, -1, -1
+
+};
+static const char* vertex = "attribute vec3 input_vertex; uniform mat4 projection; uniform mat4 view; void main(){gl_Position = projection * view * vec4(input_vertex, 1);}";
+static const char* frag = "uniform float blue; void main() {gl_FragColor = vec4(1, 1, blue, 1);}";
 QOpenGLShaderProgram shader;
 QTime timer;
 
 SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) : QOpenGLWidget(parent, f)
 {
     timer.start();
+    view.setToIdentity();
+    view.lookAt({10, 10, 10}, {0, 0, 0},  {0, 0, 1});
 }
 SampleWidget::~SampleWidget()
 {
@@ -25,6 +54,7 @@ void SampleWidget::initializeGL()
     setUpdatesEnabled(true);
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     f->glClearColor(0, 0.5, 1, 1);
+    f->glDisable(GL_CULL_FACE);
     auto context = QOpenGLContext::currentContext();
     qDebug() << QString("OpenGL Informations : GLES ? %0. Major version : %1. Minor version : %2")
                 .arg
@@ -40,14 +70,12 @@ void SampleWidget::initializeGL()
     vbo.bind();
     vbo.allocate(vertices, sizeof(vertices));
 
-    f->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), 0);
+    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
     f->glEnableVertexAttribArray(0);
 
     vao.release();
 
     //Init shader;
-    static const char* vertex = "attribute vec2 input_vertex; uniform mat4 projection; void main(){gl_Position = projection * vec4(input_vertex, 1.5, 1);}";
-    static const char* frag = "uniform float blue; void main() {gl_FragColor = vec4(1, 1, blue, 1);}";
     shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
     shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
     shader.link();
@@ -56,13 +84,8 @@ void SampleWidget::initializeGL()
 void SampleWidget::resizeGL(int w, int h)
 {
     float ratio = float(w) / float(h);
-    //projection.frustum(-1 * ratio, 1 * ratio,  -1, 1, -1, 1);
     projection.setToIdentity();
-    projection.perspective(45.0f, ratio, 0, 100);
-    //projection = projection.transposed();
-    qDebug() << projection;
-    QVector4D result = projection * QVector4D(0,0.5,1.5,1);
-    qDebug() << result / result.w();
+    projection.perspective(45, ratio, 0.1, 100);
 }
 
 void SampleWidget::paintGL()
@@ -76,7 +99,9 @@ void SampleWidget::paintGL()
     float value = 0.5 * (1 + sin(double(timer.elapsed())/300));
     shader.setUniformValue("blue", value);
     shader.setUniformValue("projection", projection);
-    f->glDrawArrays(GL_TRIANGLES, 0, 3);
+    shader.setUniformValue("view", view);
+    qDebug() << "sizeof(vertices)/12 == " << sizeof(vertices)/12;
+    f->glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices)/12);
     update();
 
 

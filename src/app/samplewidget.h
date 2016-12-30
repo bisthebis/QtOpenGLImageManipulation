@@ -17,6 +17,7 @@ protected:
 
 private:
     QMatrix4x4 projection;
+    QMatrix4x4 view;
 };
 
 #endif // SAMPLEWIDGET_H
