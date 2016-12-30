@@ -52,9 +52,10 @@ SampleWidget::~SampleWidget()
 void SampleWidget::initializeGL()
 {
     setUpdatesEnabled(true);
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    static QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     f->glClearColor(0, 0.5, 1, 1);
     f->glDisable(GL_CULL_FACE);
+    f->glEnable(GL_DEPTH_TEST);
     auto context = QOpenGLContext::currentContext();
     qDebug() << QString("OpenGL Informations : GLES ? %0. Major version : %1. Minor version : %2")
                 .arg
@@ -91,9 +92,9 @@ void SampleWidget::resizeGL(int w, int h)
 void SampleWidget::paintGL()
 {
     //qDebug() << "Drawing widget";
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    static QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
-    f->glClear(GL_COLOR_BUFFER_BIT);
+    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     vao.bind();
     float value = 0.5 * (1 + sin(double(timer.elapsed())/300));

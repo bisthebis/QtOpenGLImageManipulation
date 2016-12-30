@@ -15,6 +15,9 @@ public:
     explicit OpenGLDialogViewer(QWidget *parent = 0);
     ~OpenGLDialogViewer();
 
+private slots:
+    void on_polygonModeToggle_clicked();
+
 private:
     Ui::OpenGLDialogViewer *ui;
 };
