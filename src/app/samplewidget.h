@@ -4,13 +4,13 @@
 #include <QOpenGLWidget>
 #include <QMatrix4x4>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLFunctions>
 #include <QTime>
 #include "../opengl_utils/cube.h"
 #include "../opengl_utils/modelloader.h"
 
-class QOpenGLFunctions;
 
-class SampleWidget : public QOpenGLWidget
+class SampleWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
 public:
     SampleWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
@@ -24,7 +24,6 @@ protected:
 private:
     QMatrix4x4 projection;
     QMatrix4x4 view;
-    QOpenGLFunctions* f;
     Cube cube;
     QTime timer;
     QOpenGLShaderProgram shader;

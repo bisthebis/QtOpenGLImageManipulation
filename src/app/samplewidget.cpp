@@ -42,11 +42,11 @@ SampleWidget::~SampleWidget()
 
 void SampleWidget::initializeGL()
 {
+    initializeOpenGLFunctions();
     setUpdatesEnabled(true);
-    f = QOpenGLContext::currentContext()->functions();
-    f->glClearColor(0, 0.5, 1, 1);
-    f->glDisable(GL_CULL_FACE);
-    f->glEnable(GL_DEPTH_TEST);
+    glClearColor(0, 0.5, 1, 1);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
     auto context = QOpenGLContext::currentContext();
     qDebug() << QString("OpenGL Informations : GLES ? %0. Major version : %1. Minor version : %2")
                 .arg
@@ -72,10 +72,10 @@ void SampleWidget::initializeGL()
     qDebug() << data;
     VBO.allocate(data.data(), data.size()*sizeof(float));
 
-    f->glVertexAttribPointer(shader.attributeLocation("input_vertex"), 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
-    f->glEnableVertexAttribArray(shader.attributeLocation("input_vertex"));
-    f->glVertexAttribPointer(shader.attributeLocation("uvs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(3*sizeof(float)));
-    f->glEnableVertexAttribArray(shader.attributeLocation("uvs"));
+    glVertexAttribPointer(shader.attributeLocation("input_vertex"), 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
+    glEnableVertexAttribArray(shader.attributeLocation("input_vertex"));
+    glVertexAttribPointer(shader.attributeLocation("uvs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(3*sizeof(float)));
+    glEnableVertexAttribArray(shader.attributeLocation("uvs"));
 
     texture = new QOpenGLTexture(QImage("texture.png").mirrored());
     texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
@@ -98,7 +98,7 @@ void SampleWidget::resizeGL(int w, int h)
 
 void SampleWidget::paintGL()
 {
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     float time_factor = sin(double(timer.elapsed())/300);
     view.setToIdentity();
@@ -112,7 +112,7 @@ void SampleWidget::paintGL()
     texture->bind();
     shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
-    f->glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
     update();
