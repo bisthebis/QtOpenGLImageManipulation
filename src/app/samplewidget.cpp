@@ -10,7 +10,6 @@
 
 static const char* vertex = "#version 330 \n"
                             "in vec3 input_vertex;"
-                            //"attribute vec3 color;"
                             "in vec2 uvs;"
                             "out vec2 oUVs;"
                             "uniform mat4 projection;"
@@ -21,7 +20,6 @@ static const char* vertex = "#version 330 \n"
                             "}";
 
 static const char* frag = "#version 330 \n"
-                          //"precision mediump float;"
                           "uniform  sampler2D DiffTexture; \n"
                           "in vec2 oUVs; \n"
                           "out vec4 color; \n"
@@ -71,15 +69,17 @@ void SampleWidget::initializeGL()
 
     VBO.create();
     VBO.bind();
-    qDebug() << "Vertices pos : " << shader.attributeLocation("uvs");
+    qDebug() << data;
     VBO.allocate(data.data(), data.size()*sizeof(float));
 
     f->glVertexAttribPointer(shader.attributeLocation("input_vertex"), 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
-    f->glEnable(shader.attributeLocation("input_vertex"));
-    f->glVertexAttribPointer(shader.attributeLocation("uvs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(2*sizeof(float)));
-    f->glEnable(shader.attributeLocation("uvs"));
+    f->glEnableVertexAttribArray(shader.attributeLocation("input_vertex"));
+    f->glVertexAttribPointer(shader.attributeLocation("uvs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(3*sizeof(float)));
+    f->glEnableVertexAttribArray(shader.attributeLocation("uvs"));
 
     texture = new QOpenGLTexture(QImage("texture.png").mirrored());
+    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
     /*cube.init();
 
     shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
