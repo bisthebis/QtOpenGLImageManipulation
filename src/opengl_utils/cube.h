@@ -12,11 +12,11 @@ class Cube : public QOpenGLFunctions
 public:
     Cube();
     virtual ~Cube();
+    void init();
 
     void draw(QOpenGLShaderProgram&);
 
 private:
-    void init();
 
     QOpenGLBuffer vbo;
     QOpenGLVertexArrayObject vao;

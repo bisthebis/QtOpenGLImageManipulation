@@ -11,12 +11,6 @@ struct VertexData
 
 Cube::Cube()
 {
-    initializeOpenGLFunctions();
-
-    vbo.create();
-    vao.create();
-
-    init();
 }
 
 Cube::~Cube()
@@ -27,6 +21,11 @@ Cube::~Cube()
 
 void Cube::init()
 {
+    initializeOpenGLFunctions();
+
+    vbo.create();
+    vao.create();
+
     static const VertexData vertices[] =
     {
         //Superior face then inferior face, red

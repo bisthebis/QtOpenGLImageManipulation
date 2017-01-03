@@ -28,8 +28,6 @@ SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) : QOpenGLWidget(p
 }
 SampleWidget::~SampleWidget()
 {
-    if (cube)
-        delete cube;
 }
 
 void SampleWidget::initializeGL()
@@ -47,7 +45,7 @@ void SampleWidget::initializeGL()
                 (context->format().version().first)
                 .arg(context->format().version().second);
 
-    cube = new Cube();
+    cube.init();
 
     shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
     shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
@@ -73,7 +71,7 @@ void SampleWidget::paintGL()
     shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
 
-    cube->draw(shader);
+    cube.draw(shader);
 
 
     update();
