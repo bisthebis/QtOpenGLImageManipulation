@@ -13,14 +13,11 @@ static const QRegularExpression space_split("\\s+");
 
 ModelLoader::ModelLoader()
 {
-
 }
 
 void ModelLoader::loadFile(const QString &path)
 {
     QStringList lines = readFile(path);
-
-
 
     for (QString line : lines)
     {
@@ -95,13 +92,8 @@ void ModelLoader::loadFile(const QString &path)
             };
             triangles.append({verticesToAdd[0], verticesToAdd[1], verticesToAdd[2]});
 
-
-
         }
     }
-
-    qDebug() << "Number of triangles is : " << triangles.size();
-
 
 
 }
@@ -124,8 +116,6 @@ QVector<float> ModelLoader::toVBO(ModelLoader::ExportCategory type)
         }
     }
 
-
-    qDebug() << "Loaded a model with " << result.size() << "floats";
     return result;
 }
 
@@ -134,7 +124,11 @@ static QStringList readFile(const QString &path)
     QFile file(path);
     file.open(QFile::ReadOnly);
     if (!file.isOpen())
+    {
         qDebug() << "FAILED TO OPEN FILE. Path is : " << path;
+        qApp->exit(1);
+    }
+
     QTextStream stream(&file);
     QStringList lines;
     while (true) {
