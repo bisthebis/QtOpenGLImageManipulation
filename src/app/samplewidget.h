@@ -9,6 +9,7 @@
 #include "../opengl_utils/cube.h"
 #include "../opengl_utils/modelloader.h"
 
+class QOpenGLTexture;
 
 class SampleWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -27,6 +28,8 @@ private:
     Cube cube;
     QTime timer;
     QOpenGLShaderProgram shader;
+    QOpenGLTexture* texture;
+
 };
 
 #endif // SAMPLEWIDGET_H

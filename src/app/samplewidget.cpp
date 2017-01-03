@@ -10,23 +10,22 @@
 
 static const char* vertex = "#version 330 \n"
                             "in vec3 input_vertex;"
-                            "in vec2 uvs;"
-                            "out vec2 oUVs;"
+                            "in vec2 UVs;"
+                            "out vec2 texCoords;"
                             "uniform mat4 projection;"
                             "uniform mat4 view;"
                             "void main() {"
-                            "   oUVs = uvs;"
+                            "   texCoords = UVs;"
                             "   gl_Position = projection * view * vec4(input_vertex, 1);"
                             "}";
 
 static const char* frag = "#version 330 \n"
                           "uniform  sampler2D DiffTexture; \n"
-                          "in vec2 oUVs; \n"
+                          "in vec2 texCoords; \n"
                           "out vec4 color; \n"
-                          "void main() {color = texture(DiffTexture, oUVs);}";
+                          "void main() {color = texture(DiffTexture, texCoords);}";
 QOpenGLBuffer VBO;
 QOpenGLVertexArrayObject VAO;
-QOpenGLTexture* texture;
 
 SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) :
     QOpenGLWidget(parent, f)
@@ -37,7 +36,8 @@ SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) :
 }
 SampleWidget::~SampleWidget()
 {
-    delete texture;
+    if (texture)
+        delete texture;
 }
 
 void SampleWidget::initializeGL()
@@ -74,8 +74,8 @@ void SampleWidget::initializeGL()
 
     glVertexAttribPointer(shader.attributeLocation("input_vertex"), 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
     glEnableVertexAttribArray(shader.attributeLocation("input_vertex"));
-    glVertexAttribPointer(shader.attributeLocation("uvs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(3*sizeof(float)));
-    glEnableVertexAttribArray(shader.attributeLocation("uvs"));
+    glVertexAttribPointer(shader.attributeLocation("UVs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(3*sizeof(float)));
+    glEnableVertexAttribArray(shader.attributeLocation("UVs"));
 
     texture = new QOpenGLTexture(QImage("texture.png").mirrored());
     texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
