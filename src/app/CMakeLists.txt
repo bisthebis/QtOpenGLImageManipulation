@@ -12,6 +12,6 @@ target_link_libraries (application Qt5::Core)
 target_link_libraries (application Qt5::Gui)
 target_link_libraries (application Qt5::Widgets)
 target_link_libraries (application helpers)
-
+target_link_libraries (application opengl_utils)
 
 
