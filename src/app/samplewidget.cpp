@@ -65,11 +65,15 @@ void SampleWidget::initializeGL()
     shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
     shader.link();
     shader.bind();
-    qDebug() << "Shader log : " << shader.log();
+    {
+        QString log = shader.log();
+        if (!log.isEmpty())
+            qDebug() << "Shader log : " << shader.log();
+    }
+
 
     VBO.create();
     VBO.bind();
-    qDebug() << data;
     VBO.allocate(data.data(), data.size()*sizeof(float));
 
     glVertexAttribPointer(shader.attributeLocation("input_vertex"), 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
@@ -80,12 +84,7 @@ void SampleWidget::initializeGL()
     texture = new QOpenGLTexture(QImage("texture.png").mirrored());
     texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     texture->setMagnificationFilter(QOpenGLTexture::Linear);
-    /*cube.init();
 
-    shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
-    shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
-    shader.link();
-    shader.bind();*/
 
 
 }
@@ -104,10 +103,6 @@ void SampleWidget::paintGL()
     view.setToIdentity();
     view.lookAt({0+time_factor*5, 10+time_factor*10, 10}, {0, 0, 0},  {0, 0, 1});
 
-    /*shader.setUniformValue("projection", projection);
-    shader.setUniformValue("view", view);
-
-    cube.draw(shader);*/
     VAO.bind();
     texture->bind();
     shader.setUniformValue("projection", projection);
