@@ -6,70 +6,19 @@
 #include <QtGui>
 #include <QtCore>
 #include "../helpers/line.h"
+#include "../opengl_utils/cube.h"
 
-QOpenGLBuffer vbo;
-QOpenGLBuffer vbo2;
-QOpenGLBuffer vbo_line;
-QOpenGLVertexArrayObject vao, vao_line;
-static float vertices[] = {
-    -1, -1, -1,
-    1, -1, -1,
-    -1, 1, -1,
+static const char* vertex = "attribute vec3 input_vertex;"
+                            "attribute vec3 color;"
+                            "varying vec3 oColor;"
+                            "uniform mat4 projection;"
+                            "uniform mat4 view;"
+                            "void main() {"
+                            "   oColor = color;"
+                            "   gl_Position = projection * view * vec4(input_vertex, 1);"
+                            "}";
 
-    1, 1, -1,
-    -1, 1, -1,
-    1, -1, -1,
-
-    0, 0, 1,
-    -1, -1, -1,
-    1, -1, -1,
-
-    0, 0, 1,
-    1, -1, -1,
-    1, 1, -1,
-
-    0, 0, 1,
-    1, 1, -1,
-    -1, 1, -1,
-
-    0, 0, 1,
-    -1, 1, -1,
-    -1, -1, -1
-
-};
-
-static float colors[] = {
-    1,1,1,
-    1,1,1,
-    1,1,1,
-
-    1,1,1,
-    1,1,1,
-    1,1,1,
-
-    0,0,1,
-    0,0,1,
-    0,0,1,
-
-    0,1,0,
-    0,1,0,
-    0,1,0,
-
-    0,1,1,
-    1,1,0,
-    1,0,1,
-
-    1,0,0,
-    1,0,0,
-    1,0,0,
-};
-static const char* vertex = "attribute vec3 input_vertex; attribute vec3 color; varying vec3 oColor; uniform mat4 projection; uniform mat4 view; void main(){oColor = color; gl_Position = projection * view * vec4(input_vertex, 1);}";
 static const char* frag = "varying vec3 oColor; void main() {gl_FragColor = vec4(oColor, 1);}";
-static const char* vertex_line = "attribute vec2 input_vertex; uniform mat4 projection; uniform mat4 view; void main(){gl_Position = projection * view * vec4(input_vertex, 0, 1);}";
-static const char* frag_line = "void main() {gl_FragColor = vec4(1, 1, 1, 1);}";
-QOpenGLShaderProgram shader;
-QTime timer;
-static int sizeOfLine;
 
 SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) : QOpenGLWidget(parent, f)
 {
@@ -79,6 +28,8 @@ SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) : QOpenGLWidget(p
 }
 SampleWidget::~SampleWidget()
 {
+    if (cube)
+        delete cube;
 }
 
 void SampleWidget::initializeGL()
@@ -96,51 +47,13 @@ void SampleWidget::initializeGL()
                 (context->format().version().first)
                 .arg(context->format().version().second);
 
-    /*vao.create();
-    vao.bind();
+    cube = new Cube();
 
-    vbo.create();
-    vbo.bind();
-    vbo.allocate(vertices, sizeof(vertices));
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
-    f->glEnableVertexAttribArray(0);
-
-    vbo2.create();
-    vbo2.bind();
-    vbo2.allocate(colors, sizeof(colors));
-    f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
-    f->glEnableVertexAttribArray(1);
-
-
-
-    vao.release();*/
-
-    Line line;
-    line.pushDot({0,0});
-    line.pushDot({1,1});
-    line.pushDot({2,0});
-    line.pushDot({3,1});
-    line.pushDot({4,0});
-    *line.cutNthLine(0) += {0, -1};
-    auto data = line.toVBO();
-    sizeOfLine = data.length()/2;
-    qDebug() << data;
-    qDebug() << "Length : " << data.length();
-
-    vao_line.create();
-    vao_line.bind();
-
-    vbo_line.create();
-    vbo_line.bind();
-    vbo_line.allocate(data.constData(), data.size()*sizeof(float));
-    f->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), 0);
-    f->glEnableVertexAttribArray(0);
-
-    //Init shader;
-    shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex_line);
-    shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag_line);
+    shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
+    shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
     shader.link();
-    shader.bind();//*/
+    shader.bind();
+
 }
 void SampleWidget::resizeGL(int w, int h)
 {
@@ -153,21 +66,14 @@ void SampleWidget::paintGL()
 {
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float value = sin(double(timer.elapsed())/300);
+    float time_factor = sin(double(timer.elapsed())/300);
     view.setToIdentity();
-    view.lookAt({0, 10+value*10, 10}, {0, 0, 0},  {0, 0, 1});
+    view.lookAt({0+time_factor*5, 10+time_factor*10, 10}, {0, 0, 0},  {0, 0, 1});
 
     shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
 
-    /*vao.bind();
-    //shader.setUniformValue("value", value);
-
-    f->glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices)/12);*/
-
-    vao.bind();
-    f->glDrawArrays(GL_LINE_STRIP, 0, sizeOfLine);
-
+    cube->draw(shader);
 
 
     update();

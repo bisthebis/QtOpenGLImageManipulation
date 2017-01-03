@@ -3,8 +3,11 @@
 
 #include <QOpenGLWidget>
 #include <QMatrix4x4>
+#include <QOpenGLShaderProgram>
+#include <QTime>
 
 class QOpenGLFunctions;
+class Cube;
 
 class SampleWidget : public QOpenGLWidget
 {
@@ -21,6 +24,9 @@ private:
     QMatrix4x4 projection;
     QMatrix4x4 view;
     QOpenGLFunctions* f;
+    Cube* cube = nullptr;
+    QTime timer;
+    QOpenGLShaderProgram shader;
 };
 
 #endif // SAMPLEWIDGET_H
