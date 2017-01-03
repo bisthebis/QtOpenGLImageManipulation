@@ -4,10 +4,11 @@
 #include <QStringList>
 #include <QRegularExpression>
 #include <QCoreApplication>
+#include <QDebug>
 
 
 //Utility functions
-static QStringList readFile(const QUrl& path);
+static QStringList readFile(const QString& path);
 static const QRegularExpression space_split("\\s+");
 
 ModelLoader::ModelLoader()
@@ -15,7 +16,7 @@ ModelLoader::ModelLoader()
 
 }
 
-void ModelLoader::loadFile(const QUrl &path)
+void ModelLoader::loadFile(const QString &path)
 {
     QStringList lines = readFile(path);
 
@@ -86,15 +87,20 @@ void ModelLoader::loadFile(const QUrl &path)
             if (!OK)
                 qApp->exit(-1);
 
-            triangles.append({
-                                 {vertices[v1], texturesCoordinates[vt1], normals[vn1]},
-                                 {vertices[v2], texturesCoordinates[vt2], normals[vn2]},
-                                 {vertices[v3], texturesCoordinates[vt3], normals[vn3]}
-                             });
+
+            Vertex verticesToAdd[3] = {
+                {vertices[v1], texturesCoordinates[vt1], normals[vn1]},
+                {vertices[v2], texturesCoordinates[vt2], normals[vn2]},
+                {vertices[v3], texturesCoordinates[vt3], normals[vn3]}
+            };
+            triangles.append({verticesToAdd[0], verticesToAdd[1], verticesToAdd[2]});
+
 
 
         }
     }
+
+    qDebug() << "Number of triangles is : " << triangles.size();
 
 
 
@@ -119,13 +125,16 @@ QVector<float> ModelLoader::toVBO(ModelLoader::ExportCategory type)
     }
 
 
-
+    qDebug() << "Loaded a model with " << result.size() << "floats";
     return result;
 }
 
-static QStringList readFile(const QUrl &path)
+static QStringList readFile(const QString &path)
 {
-    QFile file(path.path());
+    QFile file(path);
+    file.open(QFile::ReadOnly);
+    if (!file.isOpen())
+        qDebug() << "FAILED TO OPEN FILE. Path is : " << path;
     QTextStream stream(&file);
     QStringList lines;
     while (true) {

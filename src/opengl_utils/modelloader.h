@@ -13,7 +13,7 @@ class ModelLoader
 {
 public:
     ModelLoader();
-    void loadFile(const QUrl& path);
+    void loadFile(const QString& path);
 
     enum ExportCategory {VerticesThenUVs};
     QVector<float> toVBO(ExportCategory type);

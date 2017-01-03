@@ -8,19 +8,30 @@
 #include "../helpers/line.h"
 #include "../opengl_utils/cube.h"
 
-static const char* vertex = "attribute vec3 input_vertex;"
-                            "attribute vec3 color;"
-                            "varying vec3 oColor;"
+static const char* vertex = "#version 330 \n"
+                            "in vec3 input_vertex;"
+                            //"attribute vec3 color;"
+                            "in vec2 uvs;"
+                            "out vec2 oUVs;"
                             "uniform mat4 projection;"
                             "uniform mat4 view;"
                             "void main() {"
-                            "   oColor = color;"
+                            "   oUVs = uvs;"
                             "   gl_Position = projection * view * vec4(input_vertex, 1);"
                             "}";
 
-static const char* frag = "varying vec3 oColor; void main() {gl_FragColor = vec4(oColor, 1);}";
+static const char* frag = "#version 330 \n"
+                          //"precision mediump float;"
+                          "uniform  sampler2D DiffTexture; \n"
+                          "in vec2 oUVs; \n"
+                          "out vec4 color; \n"
+                          "void main() {color = texture(DiffTexture, oUVs);}";
+QOpenGLBuffer VBO;
+QOpenGLVertexArrayObject VAO;
+QOpenGLTexture* texture;
 
-SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) : QOpenGLWidget(parent, f)
+SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) :
+    QOpenGLWidget(parent, f)
 {
     timer.start();
     view.setToIdentity();
@@ -28,6 +39,7 @@ SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) : QOpenGLWidget(p
 }
 SampleWidget::~SampleWidget()
 {
+    delete texture;
 }
 
 void SampleWidget::initializeGL()
@@ -45,12 +57,36 @@ void SampleWidget::initializeGL()
                 (context->format().version().first)
                 .arg(context->format().version().second);
 
-    cube.init();
+    ModelLoader loader;
+    loader.loadFile("cube.obj");
+    auto data = loader.toVBO(ModelLoader::VerticesThenUVs);
+    VAO.create();
+    VAO.bind();
 
     shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
     shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
     shader.link();
     shader.bind();
+    qDebug() << "Shader log : " << shader.log();
+
+    VBO.create();
+    VBO.bind();
+    qDebug() << "Vertices pos : " << shader.attributeLocation("uvs");
+    VBO.allocate(data.data(), data.size()*sizeof(float));
+
+    f->glVertexAttribPointer(shader.attributeLocation("input_vertex"), 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
+    f->glEnable(shader.attributeLocation("input_vertex"));
+    f->glVertexAttribPointer(shader.attributeLocation("uvs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(2*sizeof(float)));
+    f->glEnable(shader.attributeLocation("uvs"));
+
+    texture = new QOpenGLTexture(QImage("texture.png").mirrored());
+    /*cube.init();
+
+    shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
+    shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
+    shader.link();
+    shader.bind();*/
+
 
 }
 void SampleWidget::resizeGL(int w, int h)
@@ -68,10 +104,15 @@ void SampleWidget::paintGL()
     view.setToIdentity();
     view.lookAt({0+time_factor*5, 10+time_factor*10, 10}, {0, 0, 0},  {0, 0, 1});
 
-    shader.setUniformValue("projection", projection);
+    /*shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
 
-    cube.draw(shader);
+    cube.draw(shader);*/
+    VAO.bind();
+    texture->bind();
+    shader.setUniformValue("projection", projection);
+    shader.setUniformValue("view", view);
+    f->glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
     update();

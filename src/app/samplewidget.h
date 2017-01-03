@@ -6,6 +6,7 @@
 #include <QOpenGLShaderProgram>
 #include <QTime>
 #include "../opengl_utils/cube.h"
+#include "../opengl_utils/modelloader.h"
 
 class QOpenGLFunctions;
 
