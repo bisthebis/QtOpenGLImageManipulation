@@ -28,7 +28,8 @@ QOpenGLBuffer VBO;
 QOpenGLVertexArrayObject VAO;
 
 SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) :
-    QOpenGLWidget(parent, f)
+    QOpenGLWidget(parent, f),
+    texture(QOpenGLTexture::Target2D)
 {
     timer.start();
     view.setToIdentity();
@@ -36,8 +37,6 @@ SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) :
 }
 SampleWidget::~SampleWidget()
 {
-    if (texture)
-        delete texture;
 }
 
 void SampleWidget::initializeGL()
@@ -81,9 +80,10 @@ void SampleWidget::initializeGL()
     glVertexAttribPointer(shader.attributeLocation("UVs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(3*sizeof(float)));
     glEnableVertexAttribArray(shader.attributeLocation("UVs"));
 
-    texture = new QOpenGLTexture(QImage("texture.png").mirrored());
-    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    texture->setMagnificationFilter(QOpenGLTexture::Linear);
+    const auto textureImage = QImage("texture.png").mirrored();
+    texture.setData(textureImage);
+    texture.setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    texture.setMagnificationFilter(QOpenGLTexture::Linear);
 
 
 
@@ -104,7 +104,7 @@ void SampleWidget::paintGL()
     view.lookAt({0+time_factor*5, 10+time_factor*10, 10}, {0, 0, 0},  {0, 0, 1});
 
     VAO.bind();
-    texture->bind();
+    texture.bind();
     shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
     glDrawArrays(GL_TRIANGLES, 0, 36);

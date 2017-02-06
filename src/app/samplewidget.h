@@ -5,6 +5,7 @@
 #include <QMatrix4x4>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions>
+#include <QOpenGLTexture>
 #include <QTime>
 #include "../opengl_utils/cube.h"
 #include "../opengl_utils/modelloader.h"
@@ -28,7 +29,7 @@ private:
     Cube cube;
     QTime timer;
     QOpenGLShaderProgram shader;
-    QOpenGLTexture* texture;
+    QOpenGLTexture texture;
 
 };
 
