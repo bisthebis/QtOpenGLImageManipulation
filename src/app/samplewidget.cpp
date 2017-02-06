@@ -7,6 +7,7 @@
 #include <QtCore>
 #include "../helpers/line.h"
 #include "../opengl_utils/cube.h"
+#include "../helpers/file_reading.h"
 
 static const char* vertex = "#version 330 \n"
                             "in vec3 input_vertex;"
@@ -60,8 +61,11 @@ void SampleWidget::initializeGL()
     VAO.create();
     VAO.bind();
 
-    shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
-    shader.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
+    QStringList vertSource = readFile("shaders/3d_plain_textured.vert");
+    QStringList fragSource = readFile("shaders/3d_plain_textured.frag");
+
+    shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertSource.join("\n"));
+    shader.addShaderFromSourceCode(QOpenGLShader::Fragment, fragSource.join("\n"));
     shader.link();
     shader.bind();
     {

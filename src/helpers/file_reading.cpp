@@ -19,9 +19,9 @@ QStringList readFile(const QString &path)
     QStringList lines;
     while (true) {
         QString line = stream.readLine();
-        if (line.isEmpty())
-            break;
         lines << line;
+        if (stream.atEnd())
+            break;
     }
 
     file.close();
