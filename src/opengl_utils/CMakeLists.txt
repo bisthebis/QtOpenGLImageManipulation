@@ -8,3 +8,4 @@ find_package (Qt5Gui REQUIRED)
 
 target_link_libraries (opengl_utils Qt5::Core)
 target_link_libraries (opengl_utils Qt5::Gui)
+target_link_libraries (opengl_utils helpers)
