@@ -26,7 +26,6 @@ protected:
 private:
     QMatrix4x4 projection;
     QMatrix4x4 view;
-    Cube cube;
     QTime timer;
     QOpenGLShaderProgram shader;
     QOpenGLTexture texture;
