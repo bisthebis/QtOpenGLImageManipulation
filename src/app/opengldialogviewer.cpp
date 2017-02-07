@@ -1,7 +1,7 @@
 #include "opengldialogviewer.h"
 #include "ui_opengldialogviewer.h"
 #include <QOpenGLContext>
-#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLFunctions_3_0>
 
 OpenGLDialogViewer::OpenGLDialogViewer(QWidget *parent) :
     QDialog(parent),
@@ -18,13 +18,17 @@ OpenGLDialogViewer::~OpenGLDialogViewer()
 void OpenGLDialogViewer::on_polygonModeToggle_clicked()
 {
     static bool wired = false;
-    static QOpenGLFunctions_3_3_Core* functions = ui->openGLWidget->context()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+    static QOpenGLFunctions_3_0* functions = ui->openGLWidget->context()->versionFunctions<QOpenGLFunctions_3_0>();
+
+    if (!functions)
+        {
+            this->ui->polygonModeToggle->hide();
+            return;
+        }
 
     ui->openGLWidget->makeCurrent();
     functions->initializeOpenGLFunctions();
 
-    if (!functions)
-        return;
     wired = !wired;
     functions->glPolygonMode(GL_FRONT_AND_BACK, wired ? GL_LINE : GL_FILL);
 }
