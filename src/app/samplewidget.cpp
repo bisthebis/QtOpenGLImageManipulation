@@ -9,24 +9,6 @@
 #include "../opengl_utils/cube.h"
 #include "../helpers/file_reading.h"
 
-static const char* vertex = "#version 330 \n"
-                            "in vec3 input_vertex;"
-                            "in vec2 UVs;"
-                            "out vec2 texCoords;"
-                            "uniform mat4 projection;"
-                            "uniform mat4 view;"
-                            "void main() {"
-                            "   texCoords = UVs;"
-                            "   gl_Position = projection * view * vec4(input_vertex, 1);"
-                            "}";
-
-static const char* frag = "#version 330 \n"
-                          "uniform  sampler2D DiffTexture; \n"
-                          "in vec2 texCoords; \n"
-                          "out vec4 color; \n"
-                          "void main() {color = texture(DiffTexture, texCoords);}";
-QOpenGLBuffer VBO;
-QOpenGLVertexArrayObject VAO;
 
 SampleWidget::SampleWidget(QWidget *parent, Qt::WindowFlags f) :
     QOpenGLWidget(parent, f),
@@ -58,6 +40,7 @@ void SampleWidget::initializeGL()
     ModelLoader loader;
     loader.loadFile(":/cube.obj");
     auto data = loader.toVBO(ModelLoader::VerticesThenUVs);
+    cubeVerticesCount = data.size() / 5;
     VAO.create();
     VAO.bind();
 
@@ -111,7 +94,7 @@ void SampleWidget::paintGL()
     texture.bind();
     shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, cubeVerticesCount);
 
 
     update();

@@ -6,6 +6,8 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions>
 #include <QOpenGLTexture>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
 #include <QTime>
 #include "../opengl_utils/cube.h"
 #include "../opengl_utils/modelloader.h"
@@ -29,6 +31,9 @@ private:
     QTime timer;
     QOpenGLShaderProgram shader;
     QOpenGLTexture texture;
+    QOpenGLBuffer VBO;
+    QOpenGLVertexArrayObject VAO;
+    int cubeVerticesCount;
 
 };
 
