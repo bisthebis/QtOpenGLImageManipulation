@@ -3,5 +3,6 @@
         <file>shaders/3d_plain_textured.frag</file>
         <file>shaders/3d_plain_textured.vert</file>
         <file>texture.png</file>
+        <file>cube.obj</file>
     </qresource>
 </RCC>
