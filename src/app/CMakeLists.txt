@@ -2,7 +2,7 @@ file(GLOB MAIN_SOURCE_FILES . *.cpp)
 #If any UI is here :
 file(GLOB UIs . *.ui)
 
-add_executable (application ${MAIN_SOURCE_FILES} ${UIs})
+add_executable (application ${MAIN_SOURCE_FILES} ${UIs} ../../res.qrc)
 
 find_package (Qt5Core REQUIRED)
 find_package (Qt5Gui REQUIRED)
