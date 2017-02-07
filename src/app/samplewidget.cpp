@@ -56,7 +56,7 @@ void SampleWidget::initializeGL()
                 .arg(context->format().version().second);
 
     ModelLoader loader;
-    loader.loadFile("cube.obj");
+    loader.loadFile(":/cube.obj");
     auto data = loader.toVBO(ModelLoader::VerticesThenUVs);
     VAO.create();
     VAO.bind();
