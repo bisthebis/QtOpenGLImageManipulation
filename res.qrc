@@ -1,6 +1,7 @@
 <RCC>
-    <qresource prefix="/shaders">
+    <qresource prefix="/">
         <file>shaders/3d_plain_textured.frag</file>
         <file>shaders/3d_plain_textured.vert</file>
+        <file>texture.png</file>
     </qresource>
 </RCC>

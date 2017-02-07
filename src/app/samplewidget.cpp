@@ -50,7 +50,7 @@ void SampleWidget::initializeGL()
     auto context = QOpenGLContext::currentContext();
     qDebug() << QString("OpenGL Informations : GLES ? %0. Major version : %1. Minor version : %2")
                 .arg
-                (context->isOpenGLES())
+                (context->isOpenGLES() ? 'y' : 'n')
                 .arg
                 (context->format().version().first)
                 .arg(context->format().version().second);
@@ -61,8 +61,8 @@ void SampleWidget::initializeGL()
     VAO.create();
     VAO.bind();
 
-    QStringList vertSource = readFile(":/shaders/shaders/3d_plain_textured.vert");
-    QStringList fragSource = readFile(":/shaders/shaders/3d_plain_textured.frag");
+    QStringList vertSource = readFile(":/shaders/3d_plain_textured.vert");
+    QStringList fragSource = readFile(":/shaders/3d_plain_textured.frag");
 
     shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertSource.join("\n"));
     shader.addShaderFromSourceCode(QOpenGLShader::Fragment, fragSource.join("\n"));
@@ -84,7 +84,7 @@ void SampleWidget::initializeGL()
     glVertexAttribPointer(shader.attributeLocation("UVs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(3*sizeof(float)));
     glEnableVertexAttribArray(shader.attributeLocation("UVs"));
 
-    const auto textureImage = QImage("texture.png").mirrored();
+    const auto textureImage = QImage(":/texture.png").mirrored();
     texture.setData(textureImage);
     texture.setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     texture.setMagnificationFilter(QOpenGLTexture::Linear);
