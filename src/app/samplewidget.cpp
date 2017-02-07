@@ -61,7 +61,7 @@ void SampleWidget::initializeGL()
     VAO.create();
     VAO.bind();
 
-    QStringList vertSource = readFile(":/shaders/shaders/3d_plain_textured.frag");
+    QStringList vertSource = readFile(":/shaders/shaders/3d_plain_textured.vert");
     QStringList fragSource = readFile(":/shaders/shaders/3d_plain_textured.frag");
 
     shader.addShaderFromSourceCode(QOpenGLShader::Vertex, vertSource.join("\n"));
