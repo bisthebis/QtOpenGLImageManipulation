@@ -1,6 +1,7 @@
 #include "scene.h"
 #include "modelloader.h"
 #include "../helpers/file_reading.h"
+#include "drawableEntity.h"
 #include <QtCore>
 #include <QOpenGLWidget>
 

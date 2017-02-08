@@ -10,6 +10,9 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions>
+#include <QString>
+
+class DrawableEntity;
 
 class Scene : public QObject
 {
@@ -32,6 +35,7 @@ private:
   int cubeVerticesCount;
   QOpenGLContext* context;
   QOpenGLFunctions* f;
+  QMap<QString, DrawableEntity*> entities;
 
 
 };

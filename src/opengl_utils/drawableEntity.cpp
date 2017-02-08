@@ -8,7 +8,7 @@ DrawableEntity::DrawableEntity(Scene *parent) : QObject(parent), texture(QOpenGL
 }
 
 void DrawableEntity::load(QString model,
-                          QString texture,
+                          QString texturePath,
                           QString vertexShaderPath,
                           QString fragmentShaderPath,
                           QOpenGLFunctions& f)
@@ -41,7 +41,7 @@ void DrawableEntity::load(QString model,
     f.glVertexAttribPointer(shader.attributeLocation("UVs"), 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (char*)(3*sizeof(float)));
     f.glEnableVertexAttribArray(shader.attributeLocation("UVs"));
 
-    const auto textureImage = QImage(texture).mirrored();
+    const auto textureImage = QImage(texturePath).mirrored();
     texture.setData(textureImage);
     texture.setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     texture.setMagnificationFilter(QOpenGLTexture::Linear);
@@ -56,5 +56,5 @@ void DrawableEntity::draw(float timeFactor, const QMatrix4x4 &projection, const 
     shader.bind();
     shader.setUniformValue("projection", projection);
     shader.setUniformValue("view", view);
-    f->glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+    f.glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 }
