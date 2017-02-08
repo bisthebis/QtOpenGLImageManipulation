@@ -11,6 +11,7 @@
 #include <QTime>
 #include "../opengl_utils/cube.h"
 #include "../opengl_utils/modelloader.h"
+#include "../opengl_utils/scene.h"
 
 class QOpenGLTexture;
 
@@ -33,6 +34,7 @@ private:
     QOpenGLTexture texture;
     QOpenGLBuffer VBO;
     QOpenGLVertexArrayObject VAO;
+    Scene scene;
     int cubeVerticesCount;
 
 };
