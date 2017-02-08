@@ -17,6 +17,7 @@ class Scene : public QObject
 public:
     explicit Scene(QOpenGLWidget *parent = 0);
     void init();
+    QOpenGLFunctions& functions() const {return *f;}
 
 signals:
 
